@@ -8,7 +8,7 @@ from sklearn.metrics import confusion_matrix
 model = pickle.load(open("model.pkl", "rb"))
 vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 
-# Load dataset (for graphs)
+# Load dataset
 df = pd.read_csv("dataset.csv")
 
 # Preprocess function
@@ -26,11 +26,8 @@ st.subheader("Dataset Language Distribution")
 
 lang_counts = df["language"].value_counts()
 
-fig1, ax1 = plt.subplots()
-sns.barplot(x=lang_counts.index, y=lang_counts.values, ax=ax1)
-ax1.set_ylabel("Count")
-ax1.set_xlabel("Language")
-st.pyplot(fig1)
+# ✅ Streamlit chart (no seaborn/matplotlib)
+st.bar_chart(lang_counts)
 
 # -----------------------------
 # 🧠 Prediction Section
@@ -55,32 +52,25 @@ if st.button("Predict"):
 
     labels = model.classes_
 
-    fig2, ax2 = plt.subplots()
-    sns.barplot(x=labels, y=probs, ax=ax2)
-    ax2.set_ylabel("Probability")
-    ax2.set_xlabel("Language")
+    prob_df = pd.DataFrame({
+        "Language": labels,
+        "Probability": probs
+    }).set_index("Language")
 
-    st.pyplot(fig2)
+    st.bar_chart(prob_df)
 
 # -----------------------------
 # 📉 3. Confusion Matrix
 # -----------------------------
 st.subheader("Model Confusion Matrix")
 
-# Generate predictions on full dataset
 X_all = vectorizer.transform(df["text"].apply(preprocess))
 y_true = df["language"]
 y_pred = model.predict(X_all)
 
 cm = confusion_matrix(y_true, y_pred, labels=model.classes_)
 
-fig3, ax3 = plt.subplots()
-sns.heatmap(cm, annot=True, fmt="d",
-            xticklabels=model.classes_,
-            yticklabels=model.classes_,
-            cmap="Blues", ax=ax3)
+cm_df = pd.DataFrame(cm, index=model.classes_, columns=model.classes_)
 
-ax3.set_xlabel("Predicted")
-ax3.set_ylabel("Actual")
-
-st.pyplot(fig3)
+# ✅ Show as table instead of heatmap
+st.dataframe(cm_df)
