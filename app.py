@@ -2,7 +2,6 @@ import streamlit as st
 import pickle
 import re
 import pandas as pd
-import seaborn as sns
 from sklearn.metrics import confusion_matrix
 
 # Load model and vectorizer
