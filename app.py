@@ -74,3 +74,23 @@ cm_df = pd.DataFrame(cm, index=model.classes_, columns=model.classes_)
 
 # ✅ Show as table instead of heatmap
 st.dataframe(cm_df)
+import os
+
+if not os.path.exists("model.pkl"):
+    st.error("model.pkl not found")
+    st.stop()
+
+if not os.path.exists("vectorizer.pkl"):
+    st.error("vectorizer.pkl not found")
+    st.stop()
+
+if not os.path.exists("dataset.csv"):
+    st.error("dataset.csv not found")
+    st.stop()
+    if user_input.strip() == "":
+    st.warning("Please enter text")
+    st.stop()
+    sample_df = df.sample(min(len(df), 1000), random_state=42)
+
+X_all = vectorizer.transform(sample_df["text"].apply(preprocess))
+y_true = sample_df["language"]
